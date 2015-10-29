@@ -1,15 +1,28 @@
 package com.puntoslash.dipandroid;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
-public class MainActivity extends AppCompatActivity {
+import com.puntoslash.dipandroid.data.JobPostDbHelper;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final int JOB_POST_LOADER_ID = 1;
+    private JobPostAdapter jobPostAdapter;
+    private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +39,14 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        jobPostAdapter = new JobPostAdapter(this, null, 0);
+        listView = (ListView)findViewById(R.id.works_list_view);
+        listView.setAdapter(jobPostAdapter);
+        getSupportLoaderManager().initLoader(JOB_POST_LOADER_ID, null, this);
+
+        Intent intent = new Intent(this,JobPostService.class);
+        startService(intent);
     }
 
     @Override
@@ -49,4 +70,30 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void syncData(View view) {
+        Intent intent = new Intent(this,JobPostService.class);
+        startService(intent);
+    }
+
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new JobPostLoader(this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        jobPostAdapter.swapCursor(data);
+
+        JobPostContentObserver observer = new JobPostContentObserver(new Handler(), loader);
+        data.registerContentObserver(observer);
+        data.setNotificationUri(getContentResolver(), JobPostDbHelper.URI_TABLE_JOB_POST);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        jobPostAdapter.swapCursor(null);
+    }
+
 }
