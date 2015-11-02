@@ -10,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,8 +36,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent i = new Intent(MainActivity.this,JobPostRegister.class);
+                startActivity(i);
             }
         });
 
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         listView = (ListView)findViewById(R.id.works_list_view);
         listView.setAdapter(jobPostAdapter);
         getSupportLoaderManager().initLoader(JOB_POST_LOADER_ID, null, this);
-
+        //start services by default
         Intent intent = new Intent(this,JobPostService.class);
         startService(intent);
     }
@@ -64,11 +65,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id){
+            case R.id.action_settings:
+                return true;
+            case R.id.action_actualizar:
+                Intent intent = new Intent(this,JobPostService.class);
+                startService(intent);
+                return true;
+            case R.id.action_register_job:
+                Intent i = new Intent(this,JobPostRegister.class);
+                startActivity(i);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     public void syncData(View view) {
@@ -96,4 +106,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         jobPostAdapter.swapCursor(null);
     }
 
+    public void addNewJob(View view) {
+        Intent intent = new Intent(this,JobPostRegister.class);
+        startService(intent);
+    }
 }
