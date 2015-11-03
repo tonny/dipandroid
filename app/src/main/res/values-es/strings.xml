@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Dip Android</string>
+    <string name="action_actualizar">Actualizar contenido</string>
+    <string name="action_settings">Configuración</string>
+    <string name="error_field_required">Este valor es requerido</string>
+    <string name="label_contacto">Contacto</string>
+    <string name="label_description">Descripción</string>
+    <string name="label_register_job">Registrar Trabajo</string>
+    <string name="label_registrar">Registrar</string>
+    <string name="label_titulo">Título</string>
+</resources>

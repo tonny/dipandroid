@@ -31,11 +31,9 @@
             android:exported="false" >
         </service>
 
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" >
-        </activity>
         <activity android:name=".JobPostRegister" >
+        </activity>
+        <activity android:name=".JobPostView" >
         </activity>
     </application>
 

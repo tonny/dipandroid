@@ -14,14 +14,18 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.puntoslash.dipandroid.data.JobPostDbContract;
 import com.puntoslash.dipandroid.data.JobPostDbHelper;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final int JOB_POST_LOADER_ID = 1;
+    private static final String TITLE_JOB = "title";
+    private static final String DESCRIPTION_JOB = "description";
     private JobPostAdapter jobPostAdapter;
     private ListView listView;
 
@@ -42,12 +46,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         jobPostAdapter = new JobPostAdapter(this, null, 0);
+
         listView = (ListView)findViewById(R.id.works_list_view);
         listView.setAdapter(jobPostAdapter);
         getSupportLoaderManager().initLoader(JOB_POST_LOADER_ID, null, this);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this,JobPostView.class);
+                Cursor cursor = (Cursor) jobPostAdapter.getItem(position);
+                int  idPost =  cursor.getInt(cursor.getColumnIndex(JobPostDbContract.JobPost._ID));
+                String title = cursor.getString(cursor.getColumnIndex(JobPostDbContract.JobPost.TITLE_COLUMN));
+                String description = cursor.getString(cursor.getColumnIndex(JobPostDbContract.JobPost.DESCRIPTION_COLUMN));
+                intent.putExtra(TITLE_JOB,title);
+                intent.putExtra(DESCRIPTION_JOB,description);
+                startActivity(intent);
+            }
+        });
+
         //start services by default
-        Intent intent = new Intent(this,JobPostService.class);
-        startService(intent);
+        //Intent intent = new Intent(this,JobPostService.class);
+        //startService(intent);
     }
 
     @Override
@@ -66,8 +86,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //noinspection SimplifiableIfStatement
         switch (id){
-            case R.id.action_settings:
-                return true;
             case R.id.action_actualizar:
                 Intent intent = new Intent(this,JobPostService.class);
                 startService(intent);
